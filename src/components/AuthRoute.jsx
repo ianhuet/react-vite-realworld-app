@@ -1,13 +1,14 @@
 import React from 'react'
-import { Navigate, Route } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import { useAuth } from '../hooks'
 
 function AuthRoute(props) {
+  const { children } = props;
   const { isAuth } = useAuth()
 
   if (!isAuth) return <Navigate to="/" />
 
-  return <Route {...props} />
+  return children
 }
 
 export default AuthRoute

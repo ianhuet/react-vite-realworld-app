@@ -1,10 +1,17 @@
 import React from 'react'
 import { ArticleMeta, ArticleComments } from '../components'
 import { useArticleQuery } from '../hooks'
+import { types } from '../types'
 
 function Article() {
   const { data } = useArticleQuery()
-  const { title, description, body } = data.article
+
+  const article = types.isArticle(data?.article) && data?.article;
+  if (!article) {
+    return null;
+  }
+
+  const { body, description, title } = article
 
   return (
     <div className="article-page">

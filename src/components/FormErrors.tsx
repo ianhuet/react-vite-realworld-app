@@ -9,13 +9,17 @@ function FormErrors() {
 
   return (
     <ul className="error-messages">
-      {Object.entries(errors).map(([key, messages]) =>
-        /** @type {string[]} */ (messages).map((message) => (
+      {Object.entries(errors).map(([key, messages]) => {
+        if (!Array.isArray(messages)) {
+          return null;
+        }
+
+        return messages.map((message: string) => (
           <li key={`${key} ${message}`}>
             {key} {message}
           </li>
         ))
-      )}
+      })}
     </ul>
   )
 }

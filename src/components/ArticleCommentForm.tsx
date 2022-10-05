@@ -1,13 +1,22 @@
-import { Formik, Form, Field } from 'formik'
 import React from 'react'
-import { useAddCommentMutation, useArticleQuery } from '../hooks'
+import { Formik, Form, Field } from 'formik'
+import { useAddCommentMutation } from '../hooks'
+
+type FormActions = {
+  resetForm: () => void;
+};
+
+type FormValues = {
+  body: string;
+};
 
 function ArticleCommentForm() {
-  const { data } = useArticleQuery()
   const { mutateAsync } = useAddCommentMutation()
-  const { author } = data.article
 
-  async function onSubmit({ body }, { resetForm }) {
+  async function onSubmit(values: FormValues, actions: FormActions) {
+    const { body } = values
+    const { resetForm } = actions
+
     await mutateAsync({
       comment: {
         body,
@@ -32,7 +41,7 @@ function ArticleCommentForm() {
             />
           </div>
           <div className="card-footer">
-            <img src={author?.image} className="comment-author-img" />
+            <img alt="avatar" src="https://api.realworld.io/images/demo-avatar.png" className="comment-author-img" />
             <button disabled={isSubmitting} type="submit" className="btn btn-sm btn-primary">
               Post Comment
             </button>

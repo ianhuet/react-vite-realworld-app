@@ -1,9 +1,14 @@
 import axios from 'axios'
 import { useMutation } from 'react-query'
 
-function useFollowAuthorMutation(config) {
+type Config = {
+  following: boolean,
+  username: string
+}
+
+function useFollowAuthorMutation(config: Config) {
   return useMutation(
-    (/** @type {{following: boolean, username: string}} */ { following, username }) =>
+    ({ following, username }: { following: boolean, username: string }) =>
       axios[following ? 'delete' : 'post'](`/profiles/${username}/follow`),
     config
   )

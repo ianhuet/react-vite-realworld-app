@@ -5,14 +5,15 @@ import { useParams } from 'react-router-dom'
 function useAddCommentMutation() {
   const { slug } = useParams()
   const queryClient = useQueryClient()
-  const queryKey = `/articles/${slug}/comments`
+
+  const queryParam = slug || '';
+  const queryKey = `/articles/${queryParam}/comments`
 
   return useMutation(
-    (/** @type {{comment: { body: string }}} */ payload) => axios.post(`/articles/${slug}/comments`, payload),
+    (payload) => axios.post(`/articles/${queryParam}/comments`, payload),
     {
-      onMutate: async ({ comment }) => {
+      onMutate: async ({ comment }: { comment: string }) => {
         const previousComments = queryClient.getQueryData(queryKey)
-
         await queryClient.cancelQueries(queryKey)
 
         queryClient.setQueryData(queryKey, ({ comments }) => ({
@@ -21,12 +22,13 @@ function useAddCommentMutation() {
 
         return { previousComments }
       },
-      onError: (err, _, context) => {
-        // @ts-ignore
-        queryClient.setQueryData(queryKey, context.previousComments)
+      onError: (_err, _, context) => {
+        if (context !== undefined) {
+          queryClient.setQueryData(queryKey, context.previousComments)
+        }
       },
-      onSettled: () => {
-        queryClient.invalidateQueries(queryKey)
+      onSettled: async () => {
+        await queryClient.invalidateQueries(queryKey)
       },
     }
   )

@@ -4,19 +4,38 @@ import { Formik, Form, Field } from 'formik'
 import axios from 'axios'
 import { FormErrors } from '../components'
 import { useAuth } from '../hooks'
+import { Auth as AuthType } from '../types'
+
+type FormActions = {
+  setErrors: () => void;
+};
+
+type FormValues = {
+  email: string;
+  password: string;
+  username: string;
+};
+
+type AuthResponse = {
+  data : {
+    user: Partial<AuthType>
+  },
+};
 
 function Auth() {
   const navigate = useNavigate()
   const isRegister = useMatch('/register')
   const { login } = useAuth()
 
-  async function onSubmit(values, actions) {
+  async function onSubmit(values: FormValues, actions: FormActions) {
     try {
-      const { data } = await axios.post(`/users${isRegister ? '' : '/login'}`, { user: values })
+      const queryParam = isRegister ? '' : '/login';
+      const { data }: AuthResponse = await axios.post(`/users${queryParam}`, { user: values })
 
-      login(data.user)
-
-      navigate('/')
+      if (data.user !== undefined) {
+        login(data.user)
+        navigate('/')  
+      }
     } catch (error) {
       const { status, data } = error.response
 

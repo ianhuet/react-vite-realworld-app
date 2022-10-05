@@ -4,7 +4,10 @@ import { useParams } from 'react-router-dom'
 function useProfileQuery() {
   const { username } = useParams()
 
-  return useQuery(`/profiles/${username}`, { placeholderData: { profile: {} } })
+  const usernameQuery = username || ''
+  const queryUrl = `/profiles/${usernameQuery}`
+
+  return useQuery(queryUrl, { placeholderData: { profile: {} } })
 }
 
 export default useProfileQuery

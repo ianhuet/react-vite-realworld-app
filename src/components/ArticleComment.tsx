@@ -1,12 +1,26 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { useArticleCommentQuery, useAuth, useDeleteCommentMutation } from '../hooks'
+import { Comment, types } from '../types'
 
-function ArticleComment({ comment }) {
-  const { data } = useArticleCommentQuery({ comment })
+type Props = {
+  comment: Comment;
+};
+
+function ArticleComment(props: Props) {
+  const { comment } = props;
+
   const { authUser } = useAuth()
-  const { author, body, createdAt, id } = data.comment
   const { mutate } = useDeleteCommentMutation()
+
+  const { data } = useArticleCommentQuery(comment)
+
+  const commentQuery = types.isComment(data) && data.comment as Comment;
+  if (!commentQuery) {
+    return null;
+  }
+
+  const { author, body, createdAt, id } = commentQuery
   const canDelete = author?.username === authUser?.username
 
   return (
@@ -14,16 +28,18 @@ function ArticleComment({ comment }) {
       <div className="card-block">
         <p className="card-text">{body}</p>
       </div>
+
       {id && (
         <div className="card-footer">
           <Link to={`/profile/${author?.username}`} className="comment-author">
-            <img src={author?.image} className="comment-author-img" />
+            <img alt="avatar" src="https://api.realworld.io/images/demo-avatar.png" className="comment-author-img" />
           </Link>
           &nbsp;
           <Link to={`/profile/${author?.username}`} className="comment-author">
             {author?.username}
           </Link>
           <span className="date-posted">{new Date(createdAt).toDateString()}</span>
+
           {canDelete && (
             <span className="mod-options">
               <i className="ion-trash-a" onClick={() => mutate({ commentId: id })} />

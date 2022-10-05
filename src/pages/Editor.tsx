@@ -1,26 +1,38 @@
-import { Form, Formik, Field } from 'formik'
 import React from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useQueryClient } from 'react-query'
+
 import axios from 'axios'
+import { Form, Formik, Field } from 'formik'
+import { useQueryClient } from 'react-query'
+import { useNavigate } from 'react-router-dom'
+
 import { FormErrors, TagsInput } from '../components'
 import { useArticleQuery } from '../hooks'
 
+type FormFields = {
+  body: string;
+  description: string;
+  tagList: string[];
+  title: string;
+};
+
 function Editor() {
   const navigate = useNavigate()
-  const articleQuery = useArticleQuery()
   const queryClient = useQueryClient()
+
+  const articleQuery = useArticleQuery()
   const article = articleQuery?.data?.article || {}
   const { slug } = article
 
   async function onSubmit(values, { setErrors }) {
     try {
-      const { data } = await axios[slug ? 'put' : 'post'](`/articles${slug ? `/${slug}` : ''}`, { article: values })
+      const requestMethod = slug ? 'put' : 'post'
+      const queryParam = slug ? `/${slug}` : ''
+      const { data } = await axios[requestMethod](`/articles${queryParam}`, { article: values })
 
       if (slug) {
-        queryClient.invalidateQueries(`/articles/${slug}`)
+        await queryClient.invalidateQueries(`/articles/${slug}`)
       } else {
-        queryClient.invalidateQueries('/articles')
+        await queryClient.invalidateQueries('/articles')
       }
 
       navigate(`/article/${data?.article?.slug}`)
@@ -33,20 +45,22 @@ function Editor() {
     }
   }
 
+  const initialValues: Partial<FormFields> = {
+    body: article?.body || '',
+    description: article?.description || '',
+    tagList: article?.tagList || [],
+    title: article?.title || '',
+  }
+
   return (
     <div className="editor-page">
       <div className="container page">
         <div className="row">
           <div className="col-md-10 offset-md-1 col-xs-12">
             <Formik
-              onSubmit={onSubmit}
-              initialValues={{
-                title: article?.title || '',
-                description: article?.description || '',
-                body: article?.body || '',
-                tagList: article?.tagList || [],
-              }}
               enableReinitialize
+              initialValues={initialValues}
+              onSubmit={onSubmit}
             >
               {({ isSubmitting }) => (
                 <>
@@ -81,6 +95,7 @@ function Editor() {
                       <fieldset className="form-group">
                         <Field name="tagList" component={TagsInput} />
                       </fieldset>
+
                       <button className="btn btn-lg pull-xs-right btn-primary" type="submit">
                         Publish Article
                       </button>

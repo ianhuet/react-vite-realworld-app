@@ -1,19 +1,20 @@
+import React, { useEffect, useState } from 'react'
 import classNames from 'classnames'
-import React from 'react'
 import { ArticleList, PopularTags } from '../components'
 import { useAuth } from '../hooks'
+import { Filter } from '../types'
 
 const initialFilters = { tag: '', offset: null, feed: false }
 
 function Home() {
   const { isAuth } = useAuth()
-  const [filters, setFilters] = React.useState({ ...initialFilters, feed: isAuth })
+  const [filters, setFilters] = useState<Partial<Filter>>({ ...initialFilters, feed: isAuth })
 
-  React.useEffect(() => {
+  useEffect(() => {
     setFilters({ ...initialFilters, feed: isAuth })
   }, [isAuth])
 
-  function onTagClick(tag) {
+  function onTagClick(tag: string) {
     setFilters({ ...initialFilters, tag })
   }
 
@@ -51,6 +52,7 @@ function Home() {
                     </button>
                   </li>
                 )}
+
                 <li className="nav-item">
                   <button
                     type="button"
@@ -62,6 +64,7 @@ function Home() {
                     Global Feed
                   </button>
                 </li>
+
                 {filters?.tag && (
                   <li className="nav-item">
                     <a className="nav-link active"># {filters?.tag}</a>

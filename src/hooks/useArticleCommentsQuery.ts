@@ -4,7 +4,10 @@ import { useParams } from 'react-router-dom'
 function useArticleCommentsQuery() {
   const { slug } = useParams()
 
-  return useQuery(`/articles/${slug}/comments`, {
+  const articleSlug = slug || ''
+  const querylUrl = `/articles/${articleSlug}/comments`
+
+  return useQuery(querylUrl, {
     placeholderData: {
       comments: [],
     },

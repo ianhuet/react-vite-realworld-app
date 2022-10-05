@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useArticleCommentsQuery, useAuth } from '../hooks'
 import ArticleComment from './ArticleComment'
 import ArticleCommentForm from './ArticleCommentForm'
+import { Comment, types } from '../types'
 
 function ArticleComments() {
   const { isAuth } = useAuth()
@@ -16,11 +17,17 @@ function ArticleComments() {
     )
   }
 
+  let comments = types.isComment(data) && data.comments as Comment[];
+  if (!comments) {
+    comments = [];
+  }
+
   return (
     <>
       <ArticleCommentForm />
-      {data.comments.map((comment) => (
-        <ArticleComment key={comment?.id} comment={comment} />
+
+      {comments.map((comment) => (
+        <ArticleComment key={comment.id} comment={comment} />
       ))}
     </>
   )

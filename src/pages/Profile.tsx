@@ -1,21 +1,23 @@
+import React, { useCallback, useEffect, useState } from 'react'
 import classNames from 'classnames'
-import React from 'react'
 import { Link } from 'react-router-dom'
 import { ArticleList, FollowProfileButton } from '../components'
 import { useAuth, useProfileQuery } from '../hooks'
+import { Profile as ProfileType } from '../types'
 
 function Profile() {
   const { data } = useProfileQuery()
   const { authUser } = useAuth()
-  const [filters, setFilters] = React.useState({ author: '', favorited: '' })
-  const { username, image, bio } = data.profile
+  const [filters, setFilters] = useState({ author: '', favorited: '' })
+
+  const { bio, image, username } = data?.profile as ProfileType 
   const canUpdateProfile = authUser?.username === username
 
-  const setAuthorFilter = React.useCallback(() => {
+  const setAuthorFilter = useCallback(() => {
     setFilters({ author: username, favorited: '' })
   }, [username])
 
-  React.useEffect(() => {
+  useEffect(() => {
     setAuthorFilter()
   }, [username, setAuthorFilter])
 
@@ -25,9 +27,10 @@ function Profile() {
         <div className="container">
           <div className="row">
             <div className="col-xs-12 col-md-10 offset-md-1">
-              <img src={image} className="user-img" />
+              <img alt="avatar" src={image} className="user-img" />
               <h4>{username}</h4>
               <p>{bio}</p>
+
               {canUpdateProfile ? (
                 <Link className="btn btn-sm btn-outline-secondary action-btn" to="/settings">
                   <i className="ion-gear-a" /> Edit Profile Settings

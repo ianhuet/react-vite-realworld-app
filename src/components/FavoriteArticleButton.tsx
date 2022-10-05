@@ -2,12 +2,19 @@ import classNames from 'classnames'
 import React from 'react'
 import { useFavoriteArticleMutation } from '../hooks'
 
-function FavoriteArticleButton({ slug, favorited, children, className = '' }) {
-  const { mutate, isLoading } = useFavoriteArticleMutation(slug)
+type Props = {
+  children: React.ReactNode;
+  className: string;
+  favorited: boolean;
+  slug: string;
+}
+
+function FavoriteArticleButton(props: Props) {
+  const { slug, favorited, children, className = '' } = props
+  const { isLoading, mutate } = useFavoriteArticleMutation(slug)
 
   return (
     <button
-      type="button"
       className={classNames(
         'btn btn-sm',
         {
@@ -16,8 +23,9 @@ function FavoriteArticleButton({ slug, favorited, children, className = '' }) {
         },
         className
       )}
-      onClick={() => mutate({ favorited })}
       disabled={isLoading}
+      onClick={() => mutate({ favorited })}
+      type="button"
     >
       <i className="ion-heart" />
       {children}

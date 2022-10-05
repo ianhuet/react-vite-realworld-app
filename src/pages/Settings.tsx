@@ -1,33 +1,37 @@
-import { Formik, Form, Field } from 'formik'
 import React from 'react'
+import axios from 'axios'
+import { Formik, Form, Field } from 'formik'
 import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from 'react-query'
-import axios from 'axios'
 import { useAuth, useUserQuery } from '../hooks'
 import { FormErrors } from '../components'
 
+type FormActions = {
+  setErrors: () => void,
+};
+type FormValues = {
+  user,
+};
+
 function Settings() {
-  const {
-    data: { user },
-  } = useUserQuery()
+  const { data: { user }} = useUserQuery()
   const queryClient = useQueryClient()
   const navigate = useNavigate()
   const { logout } = useAuth()
 
-  async function onSubmit(values, { setErrors }) {
+  async function onSubmit(values: FormValues, { setErrors }: FormActions) {
     try {
-      const { data } = await axios.put(`/user`, { user: values })
+      const { data } = await axios.put('/user', { user: values })
+
+      logout()
 
       const updatedUsername = data?.user?.username
-
-      logout(data?.user)
-
-      queryClient.invalidateQueries(`/profiles/${updatedUsername}`)
-      queryClient.invalidateQueries(`/user`)
+      await queryClient.invalidateQueries(`/profiles/${updatedUsername}`)
+      await queryClient.invalidateQueries(`/user`)
 
       navigate(`/profile/${updatedUsername}`)
     } catch (error) {
-      const { status, data } = error.response
+      const { data, status } = error.response
 
       if (status === 422) {
         setErrors(data.errors)

@@ -1,7 +1,16 @@
-import classNames from 'classnames'
 import React from 'react'
+import classNames from 'classnames'
 
-function FollowButton({ disabled, onClick, following, username }) {
+type Props = {
+  disabled: boolean;
+  following: boolean;
+  onClick: () => void;
+  username: string;
+}
+
+function FollowButton(props: Props) {
+  const { disabled, onClick, following, username } = props
+
   return (
     <button
       disabled={disabled}

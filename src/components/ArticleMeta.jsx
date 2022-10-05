@@ -6,15 +6,15 @@ import FavoriteArticleButton from './FavoriteArticleButton'
 import FollowAuthorButton from './FollowAuthorButton'
 
 function ArticleMeta() {
-  const { data } = useArticleQuery()
   const { authUser } = useAuth()
+  const { data } = useArticleQuery()
   const { author, createdAt, favorited, favoritesCount, slug } = data.article
   const canUpdate = authUser?.username === author?.username
 
   return (
     <div className="article-meta">
       <Link to={`/profile/${author?.username}`}>
-        <img src={author?.image} />
+        <img src="https://api.realworld.io/images/demo-avatar.png" />
       </Link>
       <div className="info">
         <Link to={`/profile/${author?.username}`} className="author">
@@ -22,6 +22,7 @@ function ArticleMeta() {
         </Link>
         <span className="date">{new Date(createdAt).toDateString()}</span>
       </div>
+
       {canUpdate ? (
         <span>
           <Link className="btn btn-outline-secondary btn-sm" to={`/editor/${slug}`}>

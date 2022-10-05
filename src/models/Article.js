@@ -2,27 +2,27 @@ import Author from './Author'
 
 class Article {
   constructor({
-    slug = '',
-    title = '',
-    description = '',
+    author = new Author(),
     body = '',
-    tagList = [],
     createdAt = '',
-    updatedAt = '',
+    description = '',
     favorited = false,
     favoritesCount = 0,
-    author = new Author(),
+    slug = '',
+    tagList = [],
+    title = '',
+    updatedAt = '',
   }) {
-    this.slug = slug
-    this.title = title
-    this.description = description
+    this.author = new Author(author)
     this.body = body
-    this.tagList = tagList
     this.createdAt = new Date(createdAt).toDateString()
-    this.updatedAt = new Date(updatedAt).toDateString()
+    this.description = description
     this.favorited = favorited
     this.favoritesCount = favoritesCount
-    this.author = new Author(author)
+    this.slug = slug
+    this.tagList = tagList
+    this.title = title
+    this.updatedAt = new Date(updatedAt).toDateString()
   }
 }
 

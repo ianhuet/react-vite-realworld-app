@@ -3,12 +3,14 @@ import { useMutation, useQueryClient } from 'react-query'
 import { useParams } from 'react-router-dom'
 
 function useDeleteCommentMutation() {
-  const { slug } = useParams()
   const queryClient = useQueryClient()
-  const queryKey = `/articles/${slug}/comments`
+
+  const { slug } = useParams()
+  const queryParam = slug || '';
+  const queryKey = `/articles/${queryParam}/comments`
 
   return useMutation(
-    (/** @type {{commentId: number}} */ { commentId }) => axios.delete(`/articles/${slug}/comments/${commentId}`),
+    ({ commentId }: { commentId: number }) => axios.delete(`/articles/${queryParam}/comments/${commentId}`),
     {
       onMutate: async ({ commentId }) => {
         const previousComments = queryClient.getQueryData(queryKey)
@@ -21,12 +23,13 @@ function useDeleteCommentMutation() {
 
         return { previousComments }
       },
-      onError: (err, _, context) => {
-        // @ts-ignore
-        queryClient.setQueryData(queryKey, context.previousComments)
+      onError: (_err, _, context) => {
+        if (context !== undefined) {
+          queryClient.setQueryData(queryKey, context.previousComments)
+        }
       },
-      onSettled: () => {
-        queryClient.invalidateQueries(queryKey)
+      onSettled: async () => {
+        await queryClient.invalidateQueries(queryKey)
       },
     }
   )

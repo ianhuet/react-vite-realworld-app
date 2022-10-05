@@ -10,6 +10,7 @@ function FollowAuthorButton() {
   const { isAuth } = useAuth()
   const navigate = useNavigate()
   const { data } = useArticleQuery()
+
   const { author } = data.article
   const queryKey = `/articles/${slug}`
 

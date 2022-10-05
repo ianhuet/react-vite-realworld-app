@@ -5,11 +5,13 @@ import { useNavigate, useParams } from 'react-router-dom'
 function useDeleteArticleMutation() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const { slug } = useParams()
 
-  return useMutation(() => axios.delete(`/articles/${slug}`), {
-    onSuccess: () => {
-      queryClient.invalidateQueries('/articles')
+  const { slug } = useParams()
+  const queryParam = slug || '';
+
+  return useMutation(() => axios.delete(`/articles/${queryParam}`), {
+    onSuccess: async () => {
+      await queryClient.invalidateQueries('/articles')
 
       navigate('/')
     },

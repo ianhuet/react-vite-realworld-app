@@ -2,16 +2,30 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { useArticleQuery } from '../hooks'
 import FavoriteArticleButton from './FavoriteArticleButton'
+import { Article, types } from '../types'
 
-function ArticlePreview({ article }) {
-  const { data } = useArticleQuery({ article })
-  const { slug, author, createdAt, favoritesCount, favorited, title, body, tagList } = data?.article
+interface Props {
+  article: Article;
+}
+
+function ArticlePreview(props: Props) {
+  const { article = {} as Article } = props
+
+  const { data } = useArticleQuery(article)
+  const articleData = data?.article ? data.article : null;
+
+  if (!types.isArticle(articleData)) {
+    return null;
+  }
+
+  const { author, body, createdAt, favorited, favoritesCount, slug, tagList, title } = articleData
+  const tagSet = Array.from(new Set(tagList)).sort()
 
   return (
     <div className="article-preview" key={slug}>
       <div className="article-meta">
         <Link to={`/profile/${author?.username}`}>
-          <img src={author?.image} />
+          <img alt="avatar" src="https://api.realworld.io/images/demo-avatar.png" />
         </Link>
         <div className="info">
           <Link to={`/profile/${author?.username}`} className="author">
@@ -23,13 +37,15 @@ function ArticlePreview({ article }) {
           &nbsp;{favoritesCount}
         </FavoriteArticleButton>
       </div>
+
       <Link to={`/article/${slug}`} className="preview-link">
         <h1>{title}</h1>
         <p>{body}</p>
         <span>Read more...</span>
+
         <ul className="tag-list">
-          {tagList.map((tag) => (
-            <li key={tag} className="tag-default tag-pill tag-outline">
+          {tagSet.map((tag) => (
+            <li key={`preview-${slug}-${tag}`} className="tag-default tag-pill tag-outline">
               {tag}
             </li>
           ))}
